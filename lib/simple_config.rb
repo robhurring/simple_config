@@ -66,6 +66,10 @@ module SimpleConfig
     def truthy?
       !!value
     end
+
+    def to_h
+      {@key => value}
+    end
   end
 
   class Namespace
@@ -75,6 +79,7 @@ module SimpleConfig
       @name = name
       @environment = nil
       @settings = []
+      @namespaces = []
       instance_eval &block
     end
 
@@ -101,11 +106,29 @@ module SimpleConfig
     end
 
     def namespace(name, &block)
-      define_metaclass_method(name.to_sym) do
-        namespace = Namespace.new(name, &block)
-        namespace.use_environment(@environment)
-        namespace
+      namespace = Namespace.new(name, &block)
+      namespace.use_environment(@environment)
+      @namespaces << namespace
+
+      define_metaclass_method(name.to_sym){ namespace }
+    end
+
+    def to_h
+      key = @name
+
+      hash = {}.tap do |h|
+        h[key] ||= {}
+
+        @settings.each do |s|
+          h[key].update(s.to_h)
+        end
+
+        @namespaces.each do |n|
+          h[key].update(n.to_h)
+        end
       end
+
+      hash.has_key?(ROOT_NAMESPACE) ? hash[ROOT_NAMESPACE] : hash
     end
 
   private

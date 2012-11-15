@@ -204,7 +204,7 @@ describe '#to_h' do
       set :key, 'value'
     end
 
-    # c.to_h.should eq {key: 'value'}
+    c.to_h.should == {key: 'value'}
   end
 
   it 'should serialize namespaced settings' do
@@ -214,6 +214,6 @@ describe '#to_h' do
       end
     end
 
-    # c.to_h.should eq {test: {key: 'value'}}
+    c.to_h.should == {test: {key: 'value'}}
   end
 end
