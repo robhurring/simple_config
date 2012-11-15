@@ -131,6 +131,8 @@ describe SimpleConfig::Environment::Rails do
         environment :development, 'development'
         environment :production, 'production'
         environment :test, 'test'
+        environment(:block){ 'block' }
+
         'default'
       end
     end
@@ -162,6 +164,11 @@ describe SimpleConfig::Environment::Rails do
   it 'should not match bad environments' do
     Rails.env = :unknown_bad_environment
     subject.key.should eq 'default'
+  end
+
+  it 'should handle blocks' do
+    Rails.env = :block
+    subject.key.should eq 'block'
   end
 end
 

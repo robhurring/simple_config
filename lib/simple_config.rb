@@ -38,7 +38,7 @@ module SimpleConfig
 
   private
 
-    def environment(name_or_names, value, &block)
+    def environment(name_or_names, value = nil, &block)
       return unless @environment
 
       if Array(name_or_names).any?{ |n| @environment.matches?(n) }
