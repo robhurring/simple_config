@@ -8,9 +8,11 @@ Check the Usage for some details on how it can be used.
 
 ## Installation
 
+*No gem built yet!*
+
 Add this line to your application's Gemfile:
 
-    gem 'simple_config'
+    gem '???'
 
 And then execute:
 
@@ -18,7 +20,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install simple_config
+    $ gem install ???
 
 ## Usage
 
