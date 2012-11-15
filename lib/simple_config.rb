@@ -3,30 +3,22 @@
 # your applications configuration
 module SimpleConfig
   VERSION = '0.1'
+  ROOT_NAMESPACE = :__simple_config__
 
-  module ClassMethods
-    # Public: Create a settings namespace.
-    #
-    # block - instance eval'd block
-    #
-    # Examples
-    #
-    #   class Klass
-    #     include SimpleConfig
-    #   end
-    #
-    #   Klass.configure do
-    #     set :key, 'value'
-    #   end
-    #
-    # Returns global namespace
-    def configure(&block)
-      Namespace.new &block
+  module DSL
+    def simple_config(name, &block)
+      metaclass = (class << self; self; end)
+      metaclass.__send__(:define_method, name){ Namespace.new(name, &block) }
+      self.__send__(:define_method, name){ self.class.__send__(name) }
     end
   end
 
   def self.included(base)
-    base.extend ClassMethods
+    base.extend DSL
+  end
+
+  def self.configure(&block)
+    Namespace.new(ROOT_NAMESPACE, &block)
   end
 
   module Environment
@@ -70,14 +62,19 @@ module SimpleConfig
         @value
       end
     end
+
+    def truthy?
+      !!value
+    end
   end
 
   class Namespace
     attr_reader :environment
 
-    def initialize(name = nil, &block)
+    def initialize(name, &block)
       @name = name
       @environment = nil
+      @settings = []
       instance_eval &block
     end
 
@@ -96,7 +93,11 @@ module SimpleConfig
     end
 
     def set(name, value = nil, &block)
-      define_metaclass_method(name.to_sym){ Setting.new(self, name, value, &block).value }
+      setting =  Setting.new(self, name, value, &block)
+      @settings << setting
+
+      define_metaclass_method(name.to_sym){ setting.value }
+      define_metaclass_method(:"#{name}?"){ setting.truthy? }
     end
 
     def namespace(name, &block)
@@ -110,7 +111,7 @@ module SimpleConfig
   private
 
     def define_metaclass_method(method, &block)
-      (class << self; self; end).send :define_method, method, &block
+      (class << self; self; end).__send__ :define_method, method, &block
     end
   end
 end
