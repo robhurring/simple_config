@@ -63,7 +63,7 @@ module SimpleConfig
       end
     end
 
-    def truthy?
+    def present?
       !!value
     end
   end
@@ -94,7 +94,7 @@ module SimpleConfig
     def set(name, value = nil, &block)
       setting =  Setting.new(self, name, value, &block)
       define_metaclass_method(name.to_sym){ setting.value }
-      define_metaclass_method(:"#{name}?"){ setting.truthy? }
+      define_metaclass_method(:"#{name}?"){ setting.present? }
     end
 
     def namespace(name, &block)
