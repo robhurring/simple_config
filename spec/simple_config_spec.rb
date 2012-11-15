@@ -197,23 +197,3 @@ describe SimpleConfig::DSL do
     MyApp.new.config.should be_kind_of(SimpleConfig::Namespace)
   end
 end
-
-describe '#to_h' do
-  it 'should serialize basic settings' do
-    c = SimpleConfig.configure do
-      set :key, 'value'
-    end
-
-    c.to_h.should == {key: 'value'}
-  end
-
-  it 'should serialize namespaced settings' do
-    c = SimpleConfig.configure do
-      namespace :test do
-        set :key, 'value'
-      end
-    end
-
-    c.to_h.should == {test: {key: 'value'}}
-  end
-end
